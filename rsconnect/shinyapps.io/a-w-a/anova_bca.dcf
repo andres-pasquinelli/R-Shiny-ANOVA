@@ -1,0 +1,13 @@
+name: anova_bca
+title: ANOVA BCA
+username:
+account: a-w-a
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 205998
+bundleId: 1133699
+url: https://a-w-a.shinyapps.io/anova_bca/
+when: 1513211136.16372
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .RData|adds.R|ANOVA.html|ANOVA.Rmd|prueb.R|Rend.xlsx|reportt.pdf|reportt.utf8.pdf|Prueba/app.R
