@@ -49,7 +49,7 @@ shinyServer(function(input, output) {
     setnames(tab, input$n1, "Tratamiento")
     setnames(tab, input$n2, "Bloque")
     setnames(tab, input$n3, "RS")
-    ggplot(tab, aes(x=Tratamiento ,y=RS))+geom_boxplot(outlier.colour = "red", outlier.shape = 1, outlier.size = 4)+xlab("Tratamiento") + ylab(input$n5)+geom_jitter(aes(colour = Bloque),width = 0 )+theme_bw()
+    ggplot(tab, aes(x=Tratamiento ,y=RS))+geom_boxplot(outlier.colour = "red", outlier.shape = 1, outlier.size = 4)+xlab("Tratamiento") + ylab(input$n5)+geom_jitter(aes(colour = Bloque),width = 0 )+theme_bw()+theme(axis.text.x = element_text(angle=90))
     }})
   
   
@@ -147,6 +147,7 @@ shinyServer(function(input, output) {
             main="Prueba de comparación de medias - LSD",
             xlab="Tratamiento",
             ylab=input$n5,
+            las=3,
             col="#6393fd")
   }})
   
@@ -285,7 +286,7 @@ shinyServer(function(input, output) {
       Residuos<-residuals(ANOVA.Rend)
       dat$Predichos<-Predichos
       dat$Residuos<-Residuos
-      boxplot(Residuos~ Tratamiento,data=dat ) 
+      boxplot(Residuos~ Tratamiento,data=dat, las=3 ) 
     }})
   
   output$aditi <- renderPlot({
