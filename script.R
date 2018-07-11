@@ -1,5 +1,5 @@
 library(lattice)
-levelplot(z ~ Column*Row, data=ECR)
+levelplot(Rinde ~ Col*Row, data=ECR, xlab = "columnas", ylab = "Filas",sub ="dww", main = "ass")
 #------
 dat <- data.frame("year"= c(2000:2005),"X1"=runif(6,-3,3),"X2"=runif(6,-3,3),"X3"=runif(6,-3,3),"X4"=runif(6,-3,3),"X5"=runif(6,-3,3),"X6"=runif(6,-3,3),"X7"=runif(6,-3,3),"X8"=runif(6,-3,3),"X9"=runif(6,-3,3),"X10"=runif(6,-3,3),"X11"=runif(6,-3,3),"X12"=runif(6,-3,3))
 newd <- data.frame("year"=c(2000:2005), "val"=c(40,45,50,35,40,55), "sd"=c(5,6,8,4,5,9))

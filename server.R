@@ -12,6 +12,7 @@ library(ggplot2)
 library(agricolae)
 library(car)
 library(knitr)
+library(lattice)
 shinyServer(function(input, output) {
   
   
@@ -38,6 +39,19 @@ shinyServer(function(input, output) {
         input$n2)%>% formatRound(1:10,input$n4 ) 
   }} )
   
+  output$plano <- renderPlot({
+    if (is.null(Rend())){
+      return(NULL)}
+    if (input$n8==0||input$n9==0){
+      return(NULL)}
+    else{
+      dat<-Rend()
+      setnames(dat, input$n8, "row")
+      setnames(dat, input$n9, "col")
+      setnames(dat, input$n3, "VarDep")
+      levelplot(VarDep ~ col*row, data=dat,xlab = "Columnas",ylab = "Filas",sub="Cada rectangulo representa una parcela", main="Heat Map de la Var. Dep en el plano del ensayo")
+      
+    }})
   
   output$plots <- renderPlot({
     if (is.null(Rend())){
