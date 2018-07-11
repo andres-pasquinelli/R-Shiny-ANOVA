@@ -1,0 +1,12 @@
+name: Shiny-ANOVA
+title: Shiny-ANOVA
+username:
+account: a-w-a
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 375664
+bundleId: 1469180
+url: https://a-w-a.shinyapps.io/Shiny-ANOVA/
+when: 1530923301.53147
+asMultiple: FALSE
+asStatic: FALSE
