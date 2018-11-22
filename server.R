@@ -26,7 +26,11 @@ shinyServer(function(input, output) {
   
   output$contents <- renderDataTable({
    if (is.null(Rend())){
-     return(NULL)}
+     Datos<-c("No hay datos cargados!! Carga un archivo xlsx. Los Entrys deben tener una columna de TRATAMIENTO, BLOQUE y VARIABLE DEPENDIENTE. Como Opcional se puede carga la Col y Row del entry en el plano del ensayo")
+     
+     d<-data.table(Datos)
+     datatable(d,rownames = FALSE, colnames = NULL, options = list(dom = 't'))
+   }
     else{
     tab1<-Rend()
    tab1[,input$n1]<-lapply(tab1[,input$n1], factor)

@@ -49,7 +49,7 @@ navbarPage("ANOVA BCA",
       plotOutput("plano")
     )),
 
-
+ 
  tabPanel("Análisis",
            column(6,
                   fluidRow(
