@@ -13,6 +13,9 @@ library(agricolae)
 library(car)
 library(knitr)
 library(lattice)
+
+mydata = c("Columna..." = "")
+
 shinyServer(function(input, output) {
   
   
@@ -22,6 +25,20 @@ shinyServer(function(input, output) {
   file.rename(inFile$datapath,
               paste(inFile$datapath, ".xlsx", sep=""))
   Rend<-read_excel(paste(inFile$datapath, ".xlsx", sep=""), 1)
+  })
+  
+  output$select_data <- renderUI({
+    if (is.null(Rend())){
+      mydata = c("Columna..." = "")
+      print(paste0("You have chosen: ", Rend()[1,]))
+    }else{
+     
+      print(paste0("You have chosen: ", Rend()[1,]))
+    }  
+    
+    selectInput ("choose_data", 
+                label = "Tratamientos",
+                choices = mydata)
   })
   
   output$contents <- renderDataTable({

@@ -21,7 +21,13 @@ navbarPage("ANOVA BCA",
       numericInput("n2", "N° de columna Rep/Bloques",
                    min = 1, max = 20, value = 2, step = 1),
       numericInput("n3", "N° de columna Variable  Dependiente",
-                   min = 1, max = 20, value = 3, step = 1)
+                   min = 1, max = 20, value = 3, step = 1),
+      selectInput("tratamientos", "Tratamientos:",
+                  c("Columna..." = "","Cylinders" = "cyl",
+                    "Transmission" = "am",
+                    "Gears" = "gear")),
+      uiOutput("select_data")
+     
     
     ),
     wellPanel(
