@@ -223,6 +223,8 @@ shinyServer(function(input, output) {
     
     
     tabs<-data.table(tabs)
+    changeCols <- colnames(tabs)[which(as.vector(tabs[,lapply(.SD, class)]) == "character")]
+    tabs[,(changeCols):= NULL]
     
     tab2<-tabs[ , lapply(.SD, mean), by=c("Tratamiento"), .SDcols =-"Bloque"]
     d1<-tab2[which(tabs$Tratamiento==input$n7)]
@@ -377,7 +379,6 @@ shinyServer(function(input, output) {
       return(NULL)}
     else{
     dat<-Rend3()
-    dat$Bloque<-as.character(dat$Bloque)
   ggplot(dat, aes(x=Bloque , y=VarDep , group = Tratamiento, color = Tratamiento)) + geom_point(data = dat, aes(y = VarDep)) + geom_line(data = dat, aes(y = VarDep, group = Tratamiento, color=Tratamiento))+ xlab("Bloque") +ylab(input$n5)+  theme_bw()
   }})
   
