@@ -16,35 +16,26 @@ navbarPage("ANOVA BCA",
       fileInput('file1', 'Choose xlsx file',
                 accept = c(".xlsx")
       ),
-      numericInput("n1", "N° de columna Tratamientos",
-                   min = 1, max = 20, value = 1, step = 1),
-      numericInput("n2", "N° de columna Rep/Bloques",
-                   min = 1, max = 20, value = 2, step = 1),
-      numericInput("n3", "N° de columna Variable  Dependiente",
-                   min = 1, max = 20, value = 3, step = 1),
-      selectInput("tratamientos", "Tratamientos:",
-                  c("Columna..." = "","Cylinders" = "cyl",
-                    "Transmission" = "am",
-                    "Gears" = "gear")),
-      uiOutput("select_data")
+      tags$label("Tratamientos", style="color:#ceddfe"),
+      uiOutput("tratamientos"),
+      tags$label("Bloques/Rep", style="color:#91b3fe"),
+      uiOutput("bloques"),
+      tags$label("Variable Dependiente", style="color:#6393fd"),
+      uiOutput("dependiente")
      
     
     ),
     wellPanel(
       
       numericInput("n4", "N° de decimales:",
-                   min = 1, max = 20, value = 1, step = 1),
+                   min = 0, max = 20, value = 1, step = 1),
       numericInput("n6", "Valor Alfa %:",
                    min = 0, max = 20, value = 0.1, step = 0.05),
       textInput("n5", "Unidad Variable Dependiente",value = "Rendimiento (kg/ha)"),
       textInput("n7", "Tratamiento Testigo",value = "T1")),
       wellPanel(
-        
-        numericInput("n8", "Nº de columna Row:",
-                     min = 0, max = 20, value = 0, step = 1),
-        numericInput("n9", "Nº de columna Col:",
-                     min = 0, max = 20, value = 0, step = 1)
-        
+        uiOutput("row"),
+        uiOutput("col")
       )
       
     ),

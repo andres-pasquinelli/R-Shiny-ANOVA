@@ -14,11 +14,12 @@ library(car)
 library(knitr)
 library(lattice)
 
-mydata = c("Columna..." = "")
+
+mydata = c("Columna..."= "")
 
 shinyServer(function(input, output) {
   
-  
+ 
   Rend<-reactive({inFile <- input$file1
   if(is.null(inFile))
     return(NULL)
@@ -27,49 +28,162 @@ shinyServer(function(input, output) {
   Rend<-read_excel(paste(inFile$datapath, ".xlsx", sep=""), 1)
   })
   
-  output$select_data <- renderUI({
+  Rend2<-reactive({
+    inFile <- input$file1
+    if(is.null(inFile))
+      return(NULL)
+    file.rename(inFile$datapath,
+                paste(inFile$datapath, ".xlsx", sep=""))
+    Rend<-read_excel(paste(inFile$datapath, ".xlsx", sep=""), 1)
+    
+  })
+  Rend3<-reactive({
+    inFile <- input$file1
+    if(is.null(inFile))
+      return(NULL)
+    file.rename(inFile$datapath,
+                paste(inFile$datapath, ".xlsx", sep=""))
+    tab<-read_excel(paste(inFile$datapath, ".xlsx", sep=""), 1)
+    tab[input$choose_tratamiento]<-lapply(tab[input$choose_tratamiento], factor)
+    tab[input$choose_bloque]<-lapply(tab[input$choose_bloque], factor)
+    setnames(tab, input$choose_tratamiento, "Tratamiento")
+    setnames(tab, input$choose_bloque, "Bloque")
+    setnames(tab, input$choose_dependiente, "VarDep")
+  })
+  Rend4<-reactive({
+    inFile <- input$file1
+    if(is.null(inFile))
+      return(NULL)
+    file.rename(inFile$datapath,
+                paste(inFile$datapath, ".xlsx", sep=""))
+    dat<-read_excel(paste(inFile$datapath, ".xlsx", sep=""), 1)
+    setnames(dat, input$choose_row, "row")
+    setnames(dat, input$choose_col, "col")
+    setnames(dat, input$choose_dependiente, "VarDep")
+  })
+  
+    
+  
+  
+  
+  
+  output$tratamientos <- renderUI({
     if (is.null(Rend())){
       mydata = c("Columna..." = "")
-      print(paste0("You have chosen: ", Rend()[1,]))
+      
     }else{
      
-      print(paste0("You have chosen: ", Rend()[1,]))
+      mydata <-c(mydata,names(Rend()))
     }  
     
-    selectInput ("choose_data", 
-                label = "Tratamientos",
+    selectInput ("choose_tratamiento", 
+                 label = NULL,
                 choices = mydata)
+  })
+  output$bloques <- renderUI({
+    if (is.null(Rend())){
+      mydata = c("Columna..."= "")
+      
+    }else{
+      
+      mydata <-c(mydata,names(Rend()))
+    }  
+    
+    selectInput ("choose_bloque", 
+                 label = NULL,
+                 choices = mydata)
+  })
+  output$dependiente <- renderUI({
+    if (is.null(Rend())){
+      mydata = c("Columna..." = "")
+      
+    }else{
+      
+      mydata <-c(mydata,names(Rend()))
+    }  
+    
+    selectInput ("choose_dependiente", 
+                 label = NULL,
+                 choices = mydata)
+  })
+  output$row <- renderUI({
+    if (is.null(Rend())){
+      mydata = c("Columna..." = "")
+      
+    }else{
+      
+      mydata <-c(mydata,names(Rend()))
+    }  
+    
+    selectInput ("choose_row", 
+                 label = "Row",
+                 choices = mydata)
+  })
+  output$col <- renderUI({
+    if (is.null(Rend())){
+      mydata = c("Columna..." = "")
+      
+    }else{
+      
+      mydata <-c(mydata,names(Rend()))
+    }  
+    
+    selectInput ("choose_col", 
+                 label = "Col",
+                 choices = mydata)
   })
   
   output$contents <- renderDataTable({
-   if (is.null(Rend())){
+   if (is.null(Rend2())){
      Datos<-c("No hay datos cargados!! Carga un archivo xlsx. Los Entrys deben tener una columna de TRATAMIENTO, BLOQUE y VARIABLE DEPENDIENTE. Como Opcional se puede carga la Col y Row del entry en el plano del ensayo")
      
      d<-data.table(Datos)
      datatable(d,rownames = FALSE, colnames = NULL, options = list(dom = 't'))
+   }else{
+     
+      tab1<-Rend2()
+   
+   if(identical(input$choose_tratamiento, "")){
+     tratamiento=1
+     tratamientoColor="#ffffff"
+   }else{
+     tratamiento=input$choose_tratamiento
+     tratamientoColor="#ceddfe"
+     tab1[input$choose_tratamiento]<-lapply(tab1[input$choose_tratamiento], factor)
    }
-    else{
-    tab1<-Rend()
-   tab1[,input$n1]<-lapply(tab1[,input$n1], factor)
-   tab1[,input$n2]<-lapply(tab1[,input$n2], factor)
+   
+   if(identical(input$choose_bloque, "")){
+     bloque=1
+     bloqueColor="#ffffff"
+   }else{
+     bloque=input$choose_bloque
+     bloqueColor="#91b3fe"
+     tab1[input$choose_bloque]<-lapply(tab1[input$choose_bloque], factor)
+   }
+   if(identical(input$choose_dependiente, "")){
+     dep=1
+     depColor="#ffffff"
+   }else{
+     dep=input$choose_dependiente
+     depColor="#6393fd"
+   }
+  
    datatable(tab1, rownames = FALSE,options = list(pageLength = 15)) %>% formatStyle(
-     names(tab1[input$n1]), backgroundColor = '#6393fd')%>% formatStyle(
-       names(tab1[input$n2]),backgroundColor = '#91b3fe')%>% formatStyle(
-       names(tab1[input$n3]),backgroundColor = "#ceddfe")%>% formatString(
+     names(tab1[tratamiento]), backgroundColor = tratamientoColor)%>% formatStyle(
+       names(tab1[bloque]),backgroundColor = bloqueColor)%>% formatStyle(
+       names(tab1[dep]),backgroundColor = depColor)%>% formatString(
       input$n1)%>% formatString(
-        input$n2)%>% formatRound(1:10,input$n4 ) 
-  }} )
+        input$n2)%>% formatRound(1:10,input$n4 )} 
+   
+  })
   
   output$plano <- renderPlot({
     if (is.null(Rend())){
       return(NULL)}
-    if (input$n8==0||input$n9==0){
+    if (identical(input$choose_row, "")||identical(input$choose_col,"")){
       return(NULL)}
     else{
-      dat<-Rend()
-      setnames(dat, input$n8, "row")
-      setnames(dat, input$n9, "col")
-      setnames(dat, input$n3, "VarDep")
+      dat<-Rend4()
       levelplot(VarDep ~ col*row, data=dat,xlab = "Columnas",ylab = "Filas",sub="Cada rectangulo representa una parcela", main="Heat Map de la Var. Dep en el plano del ensayo")
       
     }})
@@ -78,13 +192,8 @@ shinyServer(function(input, output) {
     if (is.null(Rend())){
       return(NULL)}
     else{
-    tab<-Rend()
-    tab[,input$n1]<-lapply(tab[,input$n1], factor)
-    tab[,input$n2]<-lapply(tab[,input$n2], factor)
-    setnames(tab, input$n1, "Tratamiento")
-    setnames(tab, input$n2, "Bloque")
-    setnames(tab, input$n3, "RS")
-    ggplot(tab, aes(x=Tratamiento ,y=RS))+geom_boxplot(outlier.colour = "red", outlier.shape = 1, outlier.size = 4)+xlab("Tratamiento") + ylab(input$n5)+geom_jitter(aes(colour = Bloque),width = 0 )+theme_bw()+theme(axis.text.x = element_text(angle=90))
+    tab<-Rend3()
+    ggplot(tab, aes(x=Tratamiento ,y=VarDep))+geom_boxplot(outlier.colour = "red", outlier.shape = 1, outlier.size = 4)+xlab("Tratamiento") + ylab(input$n5)+geom_jitter(aes(colour = Bloque),width = 0 )+theme_bw()+theme(axis.text.x = element_text(angle=90))
     }})
   
   
@@ -92,14 +201,9 @@ shinyServer(function(input, output) {
     if (is.null(Rend())){
       return(NULL)}
     else{
-    tab<-Rend()
-    tab[,input$n1]<-lapply(tab[,input$n1], factor)
-    tab[,input$n2]<-lapply(tab[,input$n2], factor)
-    names(tab[input$n1])<-"Tratamiento"
-    setnames(tab, input$n2, "Bloque")
-    setnames(tab, input$n3, "RS")
+      tab<-Rend3()
     labe<-input$n5
-  ggplot(tab, aes(x=Bloque , y=RS , group = Tratamiento, color = Tratamiento)) + geom_point(data = tab, aes(y = RS)) + geom_line(data = tab, aes(y = RS, group = Tratamiento, color=Tratamiento))+ xlab("Bloque") +ylab(input$n5)+  theme_bw()+ theme(panel.grid.minor = element_blank(),legend.position="bottom")
+  ggplot(tab, aes(x=Bloque , y=VarDep , group = Tratamiento, color = Tratamiento)) + geom_point(data = tab, aes(y = VarDep)) + geom_line(data = tab, aes(y = VarDep, group = Tratamiento, color=Tratamiento))+ xlab("Bloque") +ylab(input$n5)+  theme_bw()+ theme(panel.grid.minor = element_blank(),legend.position="bottom")
   }})
   
   
@@ -110,18 +214,18 @@ shinyServer(function(input, output) {
       
       data.table(Datos)
       
-      }
+    }
+    
     else{
-    tab<-Rend()
-    tab<-data.table(tab)
+      
+    tabs<-Rend3()
     
-    setnames(tab, input$n1, "Tratamiento")
-    setnames(tab, input$n2, "Bloque")
-    setnames(tab, input$n3, "VarDep")
     
-    tra=colnames(Rend()[,input$n1])
-    tab2<-tab[ , lapply(.SD, mean), by=c("Tratamiento"), .SDcols =-input$n2]
-    d1<-tab2[which(tab$Tratamiento==input$n7)]
+    
+    tabs<-data.table(tabs)
+    
+    tab2<-tabs[ , lapply(.SD, mean), by=c("Tratamiento"), .SDcols =-"Bloque"]
+    d1<-tab2[which(tabs$Tratamiento==input$n7)]
     tab2$DifTest<-d1[1,c("VarDep")]
     tab2$DifTest<-tab2$VarDep-tab2$DifTest
     datatable(tab2,rownames = FALSE, options = list(
@@ -132,12 +236,7 @@ shinyServer(function(input, output) {
     if (is.null(Rend())){
       return( )}
     else{
-    dat<-Rend()
-    names(dat[input$n1])<-"Tratamiento"
-    setnames(dat, input$n2, "Bloque")
-    setnames(dat, input$n3, "VarDep")
-    dat[,input$n1]<-lapply(dat[,input$n1], factor)
-    dat[,input$n2]<-lapply(dat[,input$n2], factor)
+    dat<-Rend3()
     modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
     ANOVA.Rend<-aov(modelo.Rend)
     summary(ANOVA.Rend)
@@ -147,16 +246,9 @@ shinyServer(function(input, output) {
     if (is.null(Rend())){
       return( )}
     else{
-    dat<-Rend()
-    
-    setnames(dat, input$n1, "Tratamiento")
-    setnames(dat, input$n2, "Bloque")
-    setnames(dat, input$n3, "VarDep")
-    dat[,input$n1]<-lapply(dat[,input$n1], factor)
-    dat[,input$n2]<-lapply(dat[,input$n2], factor)
+    dat<-Rend3()
     modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
     ANOVA.Rend<-aov(modelo.Rend)
-    
     LSD.Trat.Rend<-LSD.test(ANOVA.Rend, "Tratamiento", alpha = input$n6, console = T)
   }})
   
@@ -164,15 +256,10 @@ shinyServer(function(input, output) {
     if (is.null(Rend())){
       return(NULL)}
     else{
-    dat<-Rend()
-    setnames(dat, input$n1, "Tratamiento")
-    setnames(dat, input$n2, "Bloque")
-    setnames(dat, input$n3, "VarDep")
-    dat[,input$n1]<-lapply(dat[,input$n1], factor)
-    dat[,input$n2]<-lapply(dat[,input$n2], factor)
+    dat<-Rend3()
     modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
     ANOVA.Rend<-aov(modelo.Rend)
-    mx<-max(dat[ , input$n3])
+    mx<-max(dat["VarDep"])
     mx1<-mx/10
     mx2<-mx+mx1
     LSD.Trat.Rend<-LSD.test(ANOVA.Rend, "Tratamiento", alpha = input$n6, console = F)
@@ -190,13 +277,7 @@ shinyServer(function(input, output) {
     if (is.null(Rend())){
       return(NULL)}
     else{
-    dat<-Rend()
-    
-    setnames(dat, input$n1, "Tratamiento")
-    setnames(dat, input$n2, "Bloque")
-    setnames(dat, input$n3, "VarDep")
-    dat[,input$n1]<-lapply(dat[,input$n1], factor)
-    dat[,input$n2]<-lapply(dat[,input$n2], factor)
+    dat<-Rend3()
     modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
     ANOVA.Rend<-aov(modelo.Rend)
     Predichos<-ANOVA.Rend$fitted.values #creamos los predichos
@@ -204,21 +285,15 @@ shinyServer(function(input, output) {
     dat$Predichos<-Predichos
     dat$Residuos<-Residuos
     datatable(dat,rownames = FALSE,options = list(pageLength = 15))%>% formatString(
-      input$n2)%>% formatString(
-        input$n1)%>% formatRound(1:10,input$n4 ) 
+      "Bloque")%>% formatString(
+        "Tratamiento")%>% formatRound(1:10,input$n4 ) 
   }})
   
   output$disres <- renderPlot({
     if (is.null(Rend())){
       return(NULL)}
     else{
-    dat<-Rend()
-    
-    setnames(dat, input$n1, "Tratamiento")
-    setnames(dat, input$n2, "Bloque")
-    setnames(dat, input$n3, "VarDep")
-    dat[,input$n1]<-lapply(dat[,input$n1], factor)
-    dat[,input$n2]<-lapply(dat[,input$n2], factor)
+    dat<-Rend3()
     modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
     ANOVA.Rend<-aov(modelo.Rend)
   qqPlot(rstandard(ANOVA.Rend), main="Normal Q-Q " )
@@ -229,13 +304,7 @@ shinyServer(function(input, output) {
     if (is.null(Rend())){
       return(NULL)}
     else{
-      dat<-Rend()
-      
-      setnames(dat, input$n1, "Tratamiento")
-      setnames(dat, input$n2, "Bloque")
-      setnames(dat, input$n3, "VarDep")
-      dat[,input$n1]<-lapply(dat[,input$n1], factor)
-      dat[,input$n2]<-lapply(dat[,input$n2], factor)
+      dat<-Rend3()
       modelo.Rend<-lm(VarDep ~ Tratamiento,data=dat)
       ANOVA.Rend<-aov(modelo.Rend)
       Residuales<-ANOVA.Rend$residuals
@@ -252,12 +321,7 @@ shinyServer(function(input, output) {
     if (is.null(Rend())){
       return(NULL)}
     else{
-    dat<-Rend()
-    setnames(dat, input$n1, "Tratamiento")
-    setnames(dat, input$n2, "Bloque")
-    setnames(dat, input$n3, "VarDep")
-    dat[,input$n1]<-lapply(dat[,input$n1], factor)
-    dat[,input$n2]<-lapply(dat[,input$n2], factor)
+    dat<-Rend3()
     modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
     ANOVA.Rend<-aov(modelo.Rend)
   shapiro.test(ANOVA.Rend$residuals)
@@ -267,13 +331,7 @@ shinyServer(function(input, output) {
     if (is.null(Rend())){
       return(NULL)}
     else{
-    dat<-Rend()
-    
-    setnames(dat, input$n1, "Tratamiento")
-    setnames(dat, input$n2, "Bloque")
-    setnames(dat, input$n3, "VarDep")
-    dat[,input$n1]<-lapply(dat[,input$n1], factor)
-    dat[,input$n2]<-lapply(dat[,input$n2], factor)
+    dat<-Rend3()
     modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
     ANOVA.Rend<-aov(modelo.Rend)
     Predichos<-ANOVA.Rend$fitted.values #creamos los predichos
@@ -289,12 +347,7 @@ shinyServer(function(input, output) {
     if (is.null(Rend())){
       return(NULL)}
     else{
-    dat<-Rend()
-    setnames(dat, input$n1, "Tratamiento")
-    setnames(dat, input$n2, "Bloque")
-    setnames(dat, input$n3, "VarDep")
-    dat[,input$n1]<-lapply(dat[,input$n1], factor)
-    dat[,input$n2]<-lapply(dat[,input$n2], factor)
+    dat<-Rend3()
     modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
     ANOVA.Rend<-aov(modelo.Rend)
     Predichos<-ANOVA.Rend$fitted.values #creamos los predichos
@@ -309,12 +362,7 @@ shinyServer(function(input, output) {
     if (is.null(Rend())){
       return(NULL)}
     else{
-      dat<-Rend()
-      setnames(dat, input$n1, "Tratamiento")
-      setnames(dat, input$n2, "Bloque")
-      setnames(dat, input$n3, "VarDep")
-      dat[,input$n1]<-lapply(dat[,input$n1], factor)
-      dat[,input$n2]<-lapply(dat[,input$n2], factor)
+      dat<-Rend3()
       modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
       ANOVA.Rend<-aov(modelo.Rend)
       Predichos<-fitted(ANOVA.Rend)#creamos los predichos
@@ -328,10 +376,7 @@ shinyServer(function(input, output) {
     if (is.null(Rend())){
       return(NULL)}
     else{
-    dat<-Rend()
-    setnames(dat, input$n1, "Tratamiento")
-    setnames(dat, input$n2, "Bloque")
-    setnames(dat, input$n3, "VarDep")
+    dat<-Rend3()
     dat$Bloque<-as.character(dat$Bloque)
   ggplot(dat, aes(x=Bloque , y=VarDep , group = Tratamiento, color = Tratamiento)) + geom_point(data = dat, aes(y = VarDep)) + geom_line(data = dat, aes(y = VarDep, group = Tratamiento, color=Tratamiento))+ xlab("Bloque") +ylab(input$n5)+  theme_bw()
   }})
@@ -340,13 +385,7 @@ shinyServer(function(input, output) {
     if (is.null(Rend())){
       return(NULL)}
     else{
-      dat<-Rend()
-      
-      setnames(dat, input$n1, "Tratamiento")
-      setnames(dat, input$n2, "Bloque")
-      setnames(dat, input$n3, "VarDep")
-      dat[,input$n1]<-lapply(dat[,input$n1], factor)
-      dat[,input$n2]<-lapply(dat[,input$n2], factor)
+      dat<-Rend3()
       modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
       ANOVA.Rend<-aov(modelo.Rend)
       plot(ANOVA.Rend$residuals)
