@@ -84,7 +84,7 @@ tabPanel("Supuestos Variancia",
                      tags$br(),tags$b("Prueba de Normalidad (shapiro-wilks modificado)"),
                      verbatimTextOutput("shap"),
                      tags$div("Ho: Los residuos siguen la distribución normal"),
-                        tags$br(),
+                       
                         tags$div("Ha: Los residuos no siguen la distribución normal"),
                         tags$br(),
                         tags$div("p-value > 0,05 no puedo rechazar Ho, Residuos con distribucion Normal ")
