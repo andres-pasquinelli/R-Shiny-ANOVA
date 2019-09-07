@@ -243,6 +243,15 @@ shinyServer(function(input, output) {
     ANOVA.Rend<-aov(modelo.Rend)
     summary(ANOVA.Rend)
   }})
+  output$cv <- renderPrint({
+    if (is.null(Rend())){
+      return( )}
+    else{
+      dat<-Rend3()
+      modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
+      ANOVA.Rend<-aov(modelo.Rend)
+      cv.model(ANOVA.Rend)
+    }})
   
   output$LSD <- renderPrint({
     if (is.null(Rend())){

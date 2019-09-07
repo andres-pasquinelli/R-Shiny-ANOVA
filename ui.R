@@ -52,6 +52,8 @@ navbarPage("ANOVA BCA",
                   fluidRow(
                     column(12,tags$b("Tabla de Promedios"), dataTableOutput("table"))),
                   fluidRow(
+                    column(12,tags$br(),tags$b("Coeficiente de variación"),  verbatimTextOutput("cv"))),
+                  fluidRow(
                     column(12,tags$br(),tags$b("Tabla ANOVA"),  verbatimTextOutput("anova"))),
                   fluidRow(
                     column(12,tags$b("Tabla LSD Fisher "),  verbatimTextOutput("LSD")))
@@ -80,7 +82,12 @@ tabPanel("Supuestos Variancia",
                 column(5, plotOutput("disres")),
               column(4,plotOutput("hista"),
                      tags$br(),tags$b("Prueba de Normalidad (shapiro-wilks modificado)"),
-                     verbatimTextOutput("shap"),tags$div("p-value > 0,05 no puedo rechazar Ho, Residuos con distribucion Normal ")
+                     verbatimTextOutput("shap"),
+                     tags$div("Ho: Los residuos siguen la distribución normal"),
+                        tags$br(),
+                        tags$div("Ha: Los residuos no siguen la distribución normal"),
+                        tags$br(),
+                        tags$div("p-value > 0,05 no puedo rechazar Ho, Residuos con distribucion Normal ")
                      )     
             )),
             tabPanel("Varianzas Homogeneas",
