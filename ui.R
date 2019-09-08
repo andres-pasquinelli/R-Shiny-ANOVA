@@ -75,6 +75,29 @@ column(6,
               tabPanel("Tabla de Datos", tags$br(),dataTableOutput("tabla"))
   )
 )),
+tabPanel("Comparaciones Multiples",
+         column(3,
+                wellPanel(
+                  selectInput ("compMult", 
+                               label = "Prueba",
+                               choices = c('Pruebas...'='',
+                                           'LSD'='LSD',
+                                           'Tukey'='tukey',
+                                           'Duncan'='duncan',
+                                           'Student-Newman-Keuls'='SNK',
+                                           'Scheffé'='scheffé',
+                                           'Bonferroni'='bonferroni')),
+                  tags$div( uiOutput('compMultDesc'))
+                )
+          ),
+         column(9,
+                tabsetPanel(type = "tabs",
+                            tabPanel("Tabla", tags$br(),verbatimTextOutput("compMultTabla")
+                                     
+                                       ),
+                            tabPanel("Bloques",tags$br())
+                )
+         )),
 tabPanel("Supuestos Variancia",
          tabsetPanel(type = "tabs",
             tabPanel("Residuales Normalmente Distribuidos", 
