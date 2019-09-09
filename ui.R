@@ -52,11 +52,9 @@ navbarPage("ANOVA BCA",
                   fluidRow(
                     column(12,tags$b("Tabla de Promedios"), dataTableOutput("table"))),
                   fluidRow(
-                    column(12,tags$br(),tags$b("Coeficiente de variación"),  verbatimTextOutput("cv"))),
+                    column(12,tags$br(),tags$b("Coeficiente de variación"),  verbatimTextOutput("cv"), tags$div("Referencia: < 10% Excelente - 10-20% Muy Bueno",style = "font-size:10px"))),
                   fluidRow(
-                    column(12,tags$br(),tags$b("Tabla ANOVA"),  verbatimTextOutput("anova"))),
-                  fluidRow(
-                    column(12,tags$b("Tabla LSD Fisher "),  verbatimTextOutput("LSD")))
+                    column(12,tags$br(),tags$b("Tabla ANOVA"),  verbatimTextOutput("anova")))
          
 ),
 column(6,
@@ -71,33 +69,31 @@ column(6,
                   tags$br("- Valores atipicos, aquellos puntos fuera de los bigotes. Se representan como puntos o circulos.")))
                 ),
               tabPanel("Bloques",tags$br(), plotOutput("plotsblq")),
-              tabPanel("LSD - Fisher", tags$br(),plotOutput("plotlsd")),
               tabPanel("Tabla de Datos", tags$br(),dataTableOutput("tabla"))
   )
 )),
 tabPanel("Comparaciones Multiples",
-         column(3,
+         column(2,
                 wellPanel(
                   selectInput ("compMult", 
                                label = "Prueba",
                                choices = c('Pruebas...'='',
                                            'LSD'='LSD',
-                                           'Tukey'='tukey',
-                                           'Duncan'='duncan',
+                                           'Tukey'='Tukey',
+                                           'Duncan'='Duncan',
                                            'Student-Newman-Keuls'='SNK',
-                                           'Scheffé'='scheffé',
-                                           'Bonferroni'='bonferroni')),
+                                           'Scheffé'='Scheffé',
+                                           'Bonferroni'='Bonferroni')),
                   tags$div( uiOutput('compMultDesc'))
                 )
           ),
-         column(9,
-                tabsetPanel(type = "tabs",
-                            tabPanel("Tabla", tags$br(),verbatimTextOutput("compMultTabla")
+         column(10,
+                column(6,verbatimTextOutput("compMultTabla")
                                      
                                        ),
-                            tabPanel("Bloques",tags$br())
+                column(6,plotOutput("compMultPlot"))
                 )
-         )),
+         ),
 tabPanel("Supuestos Variancia",
          tabsetPanel(type = "tabs",
             tabPanel("Residuales Normalmente Distribuidos", 

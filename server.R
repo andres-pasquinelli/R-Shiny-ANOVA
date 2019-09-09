@@ -125,20 +125,20 @@ shinyServer(function(input, output) {
     }else if(input$compMult=="LSD"){
       'Método de la diferencia mínima significativa, Least Significant Difference (LSD). 
       El Test se basa en la creación de un valor común, un umbral, basado en un test de la t de Student. Se realizan todas las diferencias entre medias de los t niveles. Las diferencias que estén por encima de este umbral indicarán una diferencia de medias significativa y las diferencias que estén por debajo indicarán una diferencia no significativa'
-    }else if(input$compMult=="tukey"){
+    }else if(input$compMult=="Tukey"){
       'Test HSD (Honestly-significant-difference) de Tukey. Se basa en la distribución del rango estudentizado que es la distribución que sigue la diferencia del máximo y del mínimo de las diferencias entre la media muestral y la media poblacional de t variables normales N(0, 1) independientes e idénticamente distribuidas.
 Se establece así un umbral, como en otros métodos, como el Test LSD. Se calculan todas las diferencias de medias muestrales entre los t niveles del factor estudiado. Las diferencias que estén por encima de ese umbral se considerarán diferencias significativas, las que no lo estén se considerarán diferencias no significativas.'
     }else if(input$compMult=="SNK"){
       'Método de  Student-Newman-Keuls (SNK). Este Test es realmente paralelo al Test de Duncan. Utiliza un umbral móvil, como esa técnica, basado en el número de medias que están implicadas en el recorrido de la resta de medias comparada pero con una diferencia: aquí el nivel de significación no cambia, no se altera, se mantiene en el general, que suele ser, como siempre en Estadística, 0.05. No aumenta como sucede en el Test de Duncan. Esto le convierte en un Test más conservador, con menos potencia.'
-    }else if(input$compMult=="scheffé"){
+    }else if(input$compMult=="Scheffé"){
       'El Test de Scheffé crea también umbral, como las otras técnicas de comparaciones múltiples, y las diferencias que superen ese umbral serán, para el método, significativas, y las que no lo superen no lo serán.
 
 '
-    }else if(input$compMult=="duncan"){
+    }else if(input$compMult=="Duncan"){
       'El Test de Duncan es muy similar al Test HSD de Tukey, pero en lugar de trabajar con un umbral fijo trabaja con un umbral cambiante. Un umbral que dependerá del número de medias implicadas en la comparación.
 
 Para saber el número de medias implicadas en la comparación se ordenan las medias muestrales de menor a mayor y así al hacer una comparación entre dos medias sabremos además de las dos medias comparadas cuantas medias quedan dentro. Este número de medias implicadas en cualquier comparación de medias es el parámetro p de este umbral.'
-    }else if(input$compMult=="bonferroni"){
+    }else if(input$compMult=="Bonferroni"){
       'El Test de Bonferroni se basa en la creación de un umbral, el BSD (Bonferroni significant difference) por encima del cual, como el LSD en el Test LSD, la diferencia entre las dos medias será significativa y por debajo del cual esa diferencia no lo será de estadísticamente significativa.'
     }
     
@@ -268,39 +268,60 @@ Para saber el número de medias implicadas en la comparación se ordenan las med
     summary(ANOVA.Rend)
   }})
   output$compMultTabla <- renderPrint({
+    if (is.null(Rend())){
+      return( )}
+    dat<-Rend3()
+    modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
+    ANOVA.Rend<-aov(modelo.Rend)
     if (input$compMult==""){
       return( )}
     else if(input$compMult=='LSD'){
-      dat<-Rend3()
-      modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
-      ANOVA.Rend<-aov(modelo.Rend)
       LSD.Trat.Rend<-LSD.test(ANOVA.Rend, "Tratamiento", alpha = input$n6, console = T)
-    }else if(input$compMult=='tukey'){
-      dat<-Rend3()
-      modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
-      ANOVA.Rend<-aov(modelo.Rend)
-      outHSD<-HSD.test(ANOVA.Rend, "Tratamiento",console=TRUE)
-    }else if(input$compMult=='duncan'){
-      dat<-Rend3()
-      modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
-      ANOVA.Rend<-aov(modelo.Rend)
-      duncan.test(ANOVA.Rend, "Tratamiento",console=TRUE)
+    }else if(input$compMult=='Tukey'){
+      outHSD<-HSD.test(ANOVA.Rend, "Tratamiento", alpha = input$n6 ,console=TRUE)
+    }else if(input$compMult=='Duncan'){
+      duncan.test(ANOVA.Rend, "Tratamiento", alpha = input$n6,console=TRUE)
     }else if (input$compMult=='SNK'){
-      dat<-Rend3()
-      modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
-      ANOVA.Rend<-aov(modelo.Rend)
-      SNK.test(ANOVA.Rend, "Tratamiento",console=TRUE)
-    }else if (input$compMult=='scheffé'){
-      dat<-Rend3()
-      modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
-      ANOVA.Rend<-aov(modelo.Rend)
-      scheffe.test(ANOVA.Rend, "Tratamiento",console=TRUE)
-    }else if (input$compMult=='bonferroni'){
-      dat<-Rend3()
-      modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
-      ANOVA.Rend<-aov(modelo.Rend)
-      LSD.test(ANOVA.Rend, "Tratamiento", p.adj= "bon",console=TRUE)
+      SNK.test(ANOVA.Rend, "Tratamiento", alpha = input$n6,console=TRUE)
+    }else if (input$compMult=='Scheffé'){
+      scheffe.test(ANOVA.Rend, "Tratamiento", alpha = input$n6,console=TRUE)
+    }else if (input$compMult=='Bonferroni'){
+      LSD.test(ANOVA.Rend, "Tratamiento", alpha = input$n6, p.adj= "bon",console=TRUE)
     }
+    })
+  output$compMultPlot <- renderPlot({
+    if (is.null(Rend())){
+      return( )}
+    dat<-Rend3()
+    modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
+    ANOVA.Rend<-aov(modelo.Rend)
+    mx<-max(dat["VarDep"])
+    mx1<-mx/10
+    mx2<-mx+mx1
+    
+    if (input$compMult==""){
+      return(NULL)}
+    else if(input$compMult=='LSD'){
+      Trat.Rend<-LSD.test(ANOVA.Rend, "Tratamiento", alpha = input$n6, console = F)
+    }else if(input$compMult=='Tukey'){
+      Trat.Rend<-HSD.test(ANOVA.Rend, "Tratamiento", alpha = input$n6, console = F)
+    }else if(input$compMult=='Duncan'){
+      Trat.Rend<-duncan.test(ANOVA.Rend, "Tratamiento", alpha = input$n6,console=TRUE)
+    }else if(input$compMult=='SNK'){
+      Trat.Rend<-SNK.test(ANOVA.Rend, "Tratamiento", alpha = input$n6,console=TRUE)
+    }else if(input$compMult=='Scheffé'){
+      Trat.Rend <-scheffe.test(ANOVA.Rend, "Tratamiento", alpha = input$n6,console=TRUE)
+    }else if(input$compMult=='Bonferroni'){
+      Trat.Rend <-LSD.test(ANOVA.Rend, "Tratamiento", alpha = input$n6, p.adj= "bon",console=TRUE)
+    }
+    bar.group(x = Trat.Rend$groups, 
+              ylim=c(0,mx2),
+              lwd=2,
+              main=paste('Prueba de comparación de medias -',input$compMult),
+              xlab="Tratamiento",
+              ylab=input$n5,
+              las=3,
+              col="#6393fd")
     })
   output$cv <- renderPrint({
     if (is.null(Rend())){
@@ -312,37 +333,6 @@ Para saber el número de medias implicadas en la comparación se ordenan las med
       cv.model(ANOVA.Rend)
     }})
   
-  
-  output$LSD <- renderPrint({
-    if (is.null(Rend())){
-      return( )}
-    else{
-    dat<-Rend3()
-    modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
-    ANOVA.Rend<-aov(modelo.Rend)
-    LSD.Trat.Rend<-LSD.test(ANOVA.Rend, "Tratamiento", alpha = input$n6, console = T)
-  }})
-  
-  output$plotlsd <- renderPlot({
-    if (is.null(Rend())){
-      return(NULL)}
-    else{
-    dat<-Rend3()
-    modelo.Rend<-lm(VarDep ~ Tratamiento+Bloque,data=dat)
-    ANOVA.Rend<-aov(modelo.Rend)
-    mx<-max(dat["VarDep"])
-    mx1<-mx/10
-    mx2<-mx+mx1
-    LSD.Trat.Rend<-LSD.test(ANOVA.Rend, "Tratamiento", alpha = input$n6, console = F)
-    bar.group(x = LSD.Trat.Rend$groups, 
-            ylim=c(0,mx2),
-            lwd=2,
-            main="Prueba de comparación de medias - LSD",
-            xlab="Tratamiento",
-            ylab=input$n5,
-            las=3,
-            col="#6393fd")
-  }})
   
   output$tabla <- renderDataTable({
     if (is.null(Rend())){
